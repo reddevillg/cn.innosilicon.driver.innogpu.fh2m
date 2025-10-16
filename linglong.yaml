@@ -1,0 +1,51 @@
+version: "1"
+
+package:
+  id: cn.innosilicon.driver.innogpu.fh2m
+  name: innogpu-fh2m
+  version: 1.0.0.0
+  kind: extension
+  description: |
+    Innosilicon Fantasy II driver
+  env:
+    __EGL_VENDOR_LIBRARY_DIRS: $PREFIX/glvnd/egl_vendor.d:$ORIGIN
+    LIBGL_DRIVERS_PATH: $ORIGIN:$PREFIX/lib/dri
+    GBM_BACKENDS_PATH: $ORIGIN:$PREFIX/lib/gbm
+    VK_ADD_DRIVER_FILES: $PREFIX/vulkan/icd.d/innoconf.json
+    LIBVA_DRIVERS_PATH: $ORIGIN:$PREFIX/lib/dri
+    OCL_ICD_VENDORS: $ORIGIN:$PREFIX/OpenCL/vendors
+
+base: org.deepin.base/25.2.1
+
+sources:
+  - kind: file
+    url: https://pools.uniontech.com/desktop-professional-V25/pool/commercial/i/innogpu-fh2m/innogpu-fh2m_20250421190503-debug_amd64.deb
+    digest: b5a70e7854db6e199d208ff31296ff637f59b5731d31e8123f95c39009f6f5b2
+    name: innogpu-fh2m.deb
+
+build: |
+  echo 'hello' #some operation to build this project
+
+  PACKAGE=/project/linglong/sources/innogpu-fh2m.deb
+
+  rm -rf extracted
+  dpkg-deb -R ${PACKAGE} extracted
+
+  mkdir -p $PREFIX/lib
+  cp -r extracted/usr/lib/${TRIPLET}/* $PREFIX/lib
+
+  mkdir -p $PREFIX/vulkan
+  cp -r extracted/etc/vulkan/* $PREFIX/vulkan
+
+  mkdir -p $PREFIX/glvnd
+  cp -r extracted/usr/share/glvnd/* $PREFIX/glvnd
+
+  mkdir -p $PREFIX/OpenCL
+  cp -r extracted/etc/OpenCL/* $PREFIX/OpenCL
+
+  mkdir -p $PREFIX/etc
+  cp ld.so.conf $PREFIX/etc/
+
+  ldconfig
+
+  echo 'build done'
